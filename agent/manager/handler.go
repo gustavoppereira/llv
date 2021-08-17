@@ -33,7 +33,9 @@ func (p PingLoggingEvent) OnEventReceived(manager Manager, event event.Event) {
 			log.Fatalf("Error watching file watcher: %v\n", err)
 		}
 		manager.SetFileWatcher(watcher)
+		manager.StartTicker()
 	case configuration.Logging:
-		manager.watcher.Watch()
+		// Keep ticking watcher to maintain tail channel
+		manager.TickWatcher()
 	}
 }

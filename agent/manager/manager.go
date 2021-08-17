@@ -7,12 +7,32 @@ import (
 	"github.com/gustavoppereira/llv/agent/mqtt"
 	"github.com/gustavoppereira/llv/agent/watcher"
 	"log"
+	"time"
 )
+
+const WatcherTickerDuration = 5 * time.Second
 
 type Manager struct {
 	mqttClient         *mqtt.Client
 	agentConfiguration *configuration.AgentConfiguration
 	watcher            *watcher.FileWatcher
+
+	watcherTicker *time.Ticker
+}
+
+func (m *Manager) StartTicker() {
+	ticker := time.NewTicker(WatcherTickerDuration)
+	go func() {
+		<-ticker.C
+		// Ticker ended without ping event. Stop and cleaning up watcher resources
+		m.watcher.Cleanup()
+		// Set back agent state to Enabled
+		m.UpdateAgentState(configuration.Enabled)
+	}()
+}
+
+func (m *Manager) TickWatcher() {
+	m.watcherTicker.Reset(WatcherTickerDuration)
 }
 
 func (m *Manager) SetFileWatcher(fileWatcher *watcher.FileWatcher) {

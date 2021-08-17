@@ -3,7 +3,10 @@ package watcher
 import (
 	"github.com/hpcloud/tail"
 	"log"
+	"time"
 )
+
+const TickerDuration = 5 * time.Second
 
 type FileWatcherListener interface {
 	OnNewLine(line string)
@@ -12,8 +15,9 @@ type FileWatcherListener interface {
 type FileWatcherHandler func(string)
 
 type FileWatcher struct {
-	path string
-	tail *tail.Tail
+	path   string
+	tail   *tail.Tail
+	ticker *time.Ticker
 
 	handler FileWatcherHandler
 }
@@ -41,6 +45,14 @@ func (f *FileWatcher) Watch() error {
 	return nil
 }
 
+func (f *FileWatcher) Tick() {
+	f.ticker.Reset(TickerDuration)
+}
+
 func (f *FileWatcher) Cleanup() {
+	err := f.tail.Stop()
+	if err != nil {
+		log.Fatalf("Error stoping watcher tail: %v\n", err)
+	}
 	f.tail.Cleanup()
 }
