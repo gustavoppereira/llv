@@ -76,7 +76,7 @@ func GetConfiguration() (*AgentConfiguration, error) {
 	var agentConfiguration = AgentConfiguration{}
 	err = json.Unmarshal(content, &agentConfiguration)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return &agentConfiguration, nil
 }

@@ -3,11 +3,11 @@ package event
 type Type string
 
 const (
-	UpdateAgent = Type("UPDATE_AGENT")
-	PingLogging = Type("PING_LOGGING")
+	UpdateAgent Type = Type("UPDATE_AGENT")
+	PingLogging Type = Type("PING_LOGGING")
 )
 
 type Event struct {
-	Type    Type
-	Payload []byte
+	Type        Type
+	Payload     []byte
 }
